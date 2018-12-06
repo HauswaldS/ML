@@ -1,0 +1,30 @@
+@import "../../../assets/scss/variables.scss";
+
+#main-container {
+  align-items: center;
+  > div {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+
+    padding: 5% 0;
+    background: $lightGrey;
+    border-radius: 5%;
+    img {
+      width: 300px;
+    }
+
+    h1 {
+      width: 100%;
+      text-align: center;
+      color: $darkBlue;
+      span {
+        display: block;
+        text-align: center;
+        color: $grey;
+      }
+    }
+  }
+}

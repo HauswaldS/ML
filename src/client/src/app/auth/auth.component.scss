@@ -1,0 +1,75 @@
+@import "../../assets/scss/variables.scss";
+
+#main-container {
+  > div {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+
+    padding: 5%;
+    background: $lightGrey;
+    border-radius: 5%;
+
+    h1 {
+      width: 100%;
+      margin: 0;
+      margin-bottom: 1rem;
+      color: $darkBlue;
+    }
+
+    p {
+      width: 100%;
+      a {
+        cursor: pointer;
+      }
+    }
+    img {
+      width: 150px;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+
+      .ui-inputgroup {
+        width: 100%;
+        margin: .7rem 0;
+        .ui-float-label {
+          width: 100%;
+          input {
+            width: 100%;
+            padding: 1rem 0 1rem .5rem;
+            border: none;
+          }
+        }
+
+        .ui-inputgroup-addon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: none;
+          background: none;
+          color: #007ad9;
+          font-size: 1.2rem;
+        }
+      }
+
+      p-message {
+        margin-bottom: .7rem;
+        margin-left: 2.3rem;
+      }
+      p-button {
+        display: flex;
+        flex: 1;
+        justify-content: flex-end;
+        align-self: flex-end;
+        margin-top: 1rem;
+
+      }
+    }
+  }
+}
