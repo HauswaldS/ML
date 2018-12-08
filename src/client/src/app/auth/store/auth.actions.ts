@@ -47,7 +47,7 @@ export class Logout implements Action {
 export class SetAccessToken implements Action {
   readonly type = SET_ACCESS_TOKEN;
 
-  constructor(public access_token: string, public expires_in: number) {
+  constructor(public access_token: string, public expires_at: number) {
   }
 }
 

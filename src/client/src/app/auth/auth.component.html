@@ -1,40 +1,48 @@
-<div class="p-grid p-justify-center p-align-center" id="main-container">
-  <div class="p-col-12 p-md-6">
+<div id="main-container" nz-row nzType="flex" nzJustify="center" nzAlign="middle">
+  <div nz-zcol nzXs="24" nzMd="12" nzLg="8">
     <img src="assets/images/electronic_brain-512.png" alt="">
     <h1>{{ isSigningUp ? 'Sign up' : 'Sign in'}}</h1>
-
-    <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
-      <div class="ui-inputgroup">
-        <span class="ui-inputgroup-addon"><i class="pi pi-envelope"></i></span>
-        <span class="ui-float-label">
-          <input id="email" type="email" pInputText formControlName="email">
-          <label for="email">Email</label>
-        </span>
-      </div>
-      <p-message severity="error"
-                 [text]="authForm.controls['email'].errors && authForm.controls['email'].errors.required ? 'Email is required' :'A valid email is required'"
-                 *ngIf="!authForm.controls['email'].valid && authForm.controls['email'].touched">
-      </p-message>
-      <div class="ui-inputgroup">
-        <span class="ui-inputgroup-addon"><i class="pi pi-lock"></i></span>
-        <span class="ui-float-label">
-          <input id="password" pPassword type="password" formControlName="password">
-          <label for="password">Password</label>
-        </span>
-      </div>
-      <p-message severity="error"
-                 [text]="authForm.controls['password'].errors && authForm.controls['password'].errors.required ? 'Password is required' :'The minimum length is 6 characters'"
-                 *ngIf="!authForm.controls['password'].valid && authForm.controls['password'].touched">
-      </p-message>
-      <p *ngIf="!isSigningUp">You don't have an account yet ? <a (click)="isSigningUp = true">Click here to sign up</a>
-      </p>
-      <p *ngIf="isSigningUp">Already have an account ? <a (click)="isSigningUp = false">Click here to sign in</a></p>
-      <p-button type="submit"
-                styleClass="ui-button-rounded ui-button-raised"
-                [label]="isSigningUp ? 'Sign up' : 'Sign in'"
-                icon="pi pi-check"
-                iconPos="right">
-      </p-button>
+    <form nz-form [formGroup]="authForm" class="login-form" (ngSubmit)="onSubmit()">
+      <nz-form-item>
+        <nz-form-control>
+          <nz-input-group [nzPrefix]="prefixEmail">
+            <input type="email" nz-input formControlName="email" placeholder="Email">
+          </nz-input-group>
+          <nz-form-explain *ngIf="!authForm.controls['email'].valid && authForm.controls['email'].dirty">
+            {{
+            authForm.controls['email'].errors && authForm.controls['email'].errors.required ?
+            'Email is required' :
+            'A valid email is required'
+            }}
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control>
+          <nz-input-group [nzPrefix]="prefixPassword">
+            <input type="password" nz-input formControlName="password" placeholder="Password">
+          </nz-input-group>
+          <nz-form-explain *ngIf="!authForm.controls['password'].valid && authForm.controls['password'].dirty">Please
+            {{
+            authForm.controls['password'].errors && authForm.controls['password'].errors.required ?
+            'Password is required' :
+            'The minimum length is 6 characters'
+            }}
+          </nz-form-explain>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <button nz-button nzBlock [nzType]="'primary'" id="submitBtn">
+          {{isSigningUp ? 'Sign up' : 'Sign in'}}
+        </button>
+        <p *ngIf="!isSigningUp">You don't have an account yet ? <a (click)="isSigningUp = true" class="helpText">Click here to sign
+          up</a>
+        </p>
+        <p *ngIf="isSigningUp">Already have an account ? <a (click)="isSigningUp = false" class="helpText">Click here to sign in</a></p>
+      </nz-form-item>
     </form>
+    <ng-template #prefixEmail><i nz-icon type="mail"></i></ng-template>
+    <ng-template #prefixPassword><i nz-icon type="lock"></i></ng-template>
+
   </div>
 </div>

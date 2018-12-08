@@ -1,0 +1,21 @@
+<div id="main-container" nz-row nzType="flex">
+  <div nz-col nzXs="6" nzMd="4" nzLg="3" id="menuContainer">
+    <ul nz-menu nzMode="vertical" nzTheme="dark">
+      <li>
+        <a routerLink="/dashboard">
+          <img src="assets/images/electronic_brain-512.png" alt="">
+        </a>
+      </li>
+      <li *ngFor="let item of menuItems" nz-menu-item
+          [nzSelected]="router.url.includes('users')">
+        <a title [routerLink]="item.routerLink">
+          <i nz-icon [type]="item.icon"></i>
+          <span *ngIf="!isCollapsed">{{item.label}}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <div nz-col nzXs="18" nzMd="20" nzLg="21">
+    <router-outlet></router-outlet>
+  </div>
+</div>

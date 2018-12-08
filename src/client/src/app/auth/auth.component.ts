@@ -15,7 +15,7 @@ export class AuthComponent implements OnInit {
   isSigningUp: boolean = false;
   authForm: FormGroup;
 
-  constructor(private store: Store<fromAuth.FeatureState>) {
+  constructor(private store: Store<fromAuth.State>) {
   }
 
   ngOnInit() {
