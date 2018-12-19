@@ -4,7 +4,13 @@
 
 export const environment = {
   production: false,
-  hmr: false
+  hmr: false,
+  baseUrl: 'http://localhost:3000',
+  auth0appDomain: 'https://mlfordummies.eu.auth0.com',
+  auth0audience: 'lm-api',
+  auth0ClientId: 'W3Sj3qkRSTsDHUh6C3nWDogb33I7nDNK',
+  auth0ClientSecret: '3D-SmhRsZZBXNgUq1gRkhkYfTbxpE9sCr2d7_vdQ8W2EIZB63STg76TObhuEgJpl',
+  auth0Connection: 'Username-Password-Authentication'
 };
 
 /*

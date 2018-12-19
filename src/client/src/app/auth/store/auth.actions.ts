@@ -51,6 +51,7 @@ export class SetAccessToken implements Action {
   }
 }
 
+
 export class SetRefreshToken implements Action {
   readonly type = SET_REFRESH_TOKEN;
 
@@ -58,13 +59,13 @@ export class SetRefreshToken implements Action {
   }
 }
 
-
-export class TryRefreshAccessToken implements Action {
-  readonly type = TRY_REFRESH_ACCESS_TOKEN;
-
-  constructor() {
-  }
-}
+//TODO: Implement refresh token flow
+// export class TryRefreshAccessToken implements Action {
+//   readonly type = TRY_REFRESH_ACCESS_TOKEN;
+//
+//   constructor() {
+//   }
+// }
 
 
 export type AuthActions =
@@ -75,4 +76,4 @@ export type AuthActions =
   | Logout
   | SetAccessToken
   | SetRefreshToken
-  | TryRefreshAccessToken
+

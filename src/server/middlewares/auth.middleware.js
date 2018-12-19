@@ -1,5 +1,8 @@
 import jwt from "express-jwt";
 import jwks from 'jwks-rsa';
+import getDotenv from '../utils/dotenv';
+
+getDotenv();
 
 
 export const getUserFromRequest = jwt({
@@ -9,7 +12,7 @@ export const getUserFromRequest = jwt({
         jwksRequestsPerMinute: 5,
         jwksUri: `${process.env.AUTH0_ISSUER}.well-known/jwks.json`
     }),
-    audience: process.env.AUTH0_AUDIENCE,
+    audience: process.env.AUTH0_AUDIENCE_M_TO_M,
     issuer: process.env.AUTH0_ISSUER,
     credentialsRequired: false,
     algorithms: ['RS256']

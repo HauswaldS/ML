@@ -9,41 +9,38 @@ db.useBasicAuth(process.env.DB_USERNAME, process.env.DB_PASSWORD);
 
 export default {
     getUsers({page, limit, searchProp, searchValue}) {
-        console.log(page, limit, searchProp, searchValue)
         return db.query(aql`
-            LET userCount = LENGTH(Users)  
+            LET totalCount = LENGTH((FOR user in Users
+                            FILTER user[${searchProp}] LIKE ${`%${searchValue}%`}
+                            RETURN user))  
             LET users = (FOR user in Users
-                            LIMIT ${(page - 1) * limit}, ${limit * 2}
-                            FILTER user[${searchProp}] == ${searchValue}
-                            RETURN user)
+                            FILTER user[${searchProp}] LIKE ${`%${searchValue}%`}
+                            SORT user._key DESC
+                            LIMIT ${(page - 1) * limit}, ${+limit}  
+                            RETURN MERGE(user, {groups: DOCUMENT("Users_groups", user.groups)}))
             RETURN {
                 users,
-                userCount
+                totalCount
             }
-        `).then(cursor => cursor._result)
+        `).then(cursor => cursor._result[0])
     },
     getUser(userId) {
         return db.query(aql`
            FOR user IN Users
                FILTER user._key == ${userId} 
                RETURN MERGE(user, {groups: DOCUMENT("Users_groups", user.groups)})
-       `).then(cursor => {
-            console.log(cursor)
-            return cursor._result[0]
-        })
+       `).then(cursor => cursor._result[0])
     },
     createUser(payload) {
         return db.query(aql`
             INSERT ${payload} IN Users
             RETURN NEW
-       `).then(cursor => cursor._result[0])
+       `).then(cursor => this.getUser(cursor._result[0]._key))
     },
     updateUser(payload, userId) {
         return db.query(aql`
-           UPDATE ${userId} WITH ${payload}
-           IN Users
-           RETURN NEW
-       `).then(cursor => cursor._result[0])
+           UPDATE ${userId} WITH ${payload} IN Users
+       `).then(() => this.getUser(userId))
     },
     deleteUser(userId) {
         return db.query(aql`
@@ -54,10 +51,7 @@ export default {
         return db.query(aql`
             FOR userGroup IN Users_groups
                 RETURN userGroup
-       `).then(cursor => {
-            console.log('cursor', cursor)
-            return cursor._result
-        })
+       `).then(cursor => cursor._result)
     }
 }
 

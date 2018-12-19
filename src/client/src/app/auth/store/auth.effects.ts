@@ -1,100 +1,75 @@
-import {Injectable} from "@angular/core";
-import {Actions, Effect} from "@ngrx/effects";
+import {Inject, Injectable} from "@angular/core";
+import {Actions, Effect, ofType} from "@ngrx/effects";
 import {HttpClient} from "@angular/common/http";
 import {Store} from "@ngrx/store";
 
-import {catchError, map, mergeMap, switchMap, take} from 'rxjs/operators';
-import {of} from "rxjs";
+import {map, mergeMap, switchMap} from 'rxjs/operators';
 
 import * as AuthActions from './auth.actions';
+
 import * as fromAuth from './auth.reducers'
+
 import {Router} from "@angular/router";
 
 
 @Injectable()
 export class AuthEffects {
-  appDomain = 'https://mlfordummies.eu.auth0.com';
-  audience = 'https://mlfordummies.eu.auth0.com/api/v2/';
-
-  connection = 'Username-Password-Authentication';
-
-  userSignedUp = {
-    email: '',
-    password: ''
-  };
 
   @Effect()
-  authSignup = this.actions$
-    .ofType(AuthActions.TRY_SIGNUP)
-    .pipe(map((action: AuthActions.TrySignup) => {
-      return action.payload;
-    }))
-    .pipe(switchMap((userCredentials: { email: string, password: string }) => {
-      const payload = {
-        client_id: this.client_id,
-        connection: this.connection,
-        email: userCredentials.email,
-        password: userCredentials.password
-      };
+  authSignup =
+    this.actions$
+      .pipe(ofType(AuthActions.TRY_SIGNUP))
+      .pipe(map((action: AuthActions.TrySignup) => {
+        return action.payload;
+      }))
+      .pipe(switchMap((userCredentials: { email: string, password: string }) => {
+        const userPayload = {
+          username: userCredentials.email.split('@')[0],
+          email: userCredentials.email,
+          password: userCredentials.password,
+          groups: ['16993']
+        };
 
-      this.userSignedUp.email = userCredentials.email;
-      this.userSignedUp.password = userCredentials.password;
+        return this.http.post(`${this.baseUrl}/api/users`, userPayload)
+      }))
+      .pipe(mergeMap((user: {
+        email: string,
+        password: string
+      }) => {
+        return [
+          {
+            type: AuthActions.SIGNUP
+          },
+          {
+            type: AuthActions.TRY_SIGNIN,
+            payload: {
+              email: user.email,
+              password: user.password,
+            }
+          }
+        ]
+      }));
 
-      return this.http.post(`${this.appDomain}/dbconnections/signup`, payload);
-    }))
-    .pipe(switchMap((user: { email: string, email_verified: boolean, _id: string }) => {
-      const payload = {
-        grant_type: 'password',
-        client_id: this.client_id,
-        client_secret: this.client_secret,
-        username: this.userSignedUp.email,
-        password: this.userSignedUp.password,
-        audience: this.audience,
-        scope: 'offline_access'
-      };
-      return this.http.post(`${this.appDomain}/oauth/token`, payload)
-    }))
-    .pipe(mergeMap((result: {
-      access_token: string,
-      token_type: string,
-      expires_in: number,
-      refresh_token: string
-    }) => {
-      this.router.navigate(['/dashboard'])
-      return [
-        {
-          type: AuthActions.SIGNUP
-        },
-        {
-          type: AuthActions.SET_REFRESH_TOKEN,
-          refresh_token: result.refresh_token
-        },
-        {
-          type: AuthActions.SET_ACCESS_TOKEN,
-          access_token: result.access_token,
-          expires_in: result.expires_in
-        },
-      ]
-    }));
 
   @Effect()
   authSignIn = this.actions$
-    .ofType(AuthActions.TRY_SIGNIN)
+    .pipe(ofType(AuthActions.TRY_SIGNIN))
     .pipe(map((action: AuthActions.TrySignin) => {
       return action.payload;
     }))
     .pipe(switchMap((userCredentials: { email: string, password: string }) => {
       const payload = {
         grant_type: 'password',
-        client_id: this.client_id,
-        client_secret: this.client_secret,
+
+        client_id: this.auth0ClientId,
+        client_secret: this.auth0ClientSecret,
         username: userCredentials.email,
         password: userCredentials.password,
-        audience: this.audience,
+        auth0Audience: this.auth0Audience,
         scope: 'offline_access'
       };
 
-      return this.http.post(`${this.appDomain}/oauth/token`, payload)
+      return this.http.post(`${this.auth0AppDomain}/oauth/token`, payload)
     }))
     .pipe(mergeMap((
       result: {
@@ -115,44 +90,56 @@ export class AuthEffects {
         {
           type: AuthActions.SET_ACCESS_TOKEN,
           access_token: result.access_token,
-          expires_in: result.expires_in
+          expires_at: result.expires_in
         },
       ]
     }));
 
-  @Effect()
-  refreshToken = this.actions$
-    .ofType(null)
-    .pipe(switchMap(() => this.store.select('auth')))
-    .pipe(switchMap((authState: { token: { refresh_token: string } }) => {
-      const payload = {
-        grant_type: "refresh_token",
-        client_id: this.client_id,
-        client_secret: this.client_secret,
-        refresh_token: authState.token.refresh_token
-      };
-      return this.http.post(`${this.appDomain}/oauth/token`, payload)
-    }))
-    .pipe(switchMap((result: {
-      access_token: string,
-      expires_in: number,
-      scope: string,
-      id_token: string,
-      token_type: string
-    }) => {
-      return [
-        {
-          type: AuthActions.SET_ACCESS_TOKEN,
-          access_token: result.access_token,
-          expires_in: result.expires_in
-        }
-      ]
-    }))
-    .pipe(catchError(err => of(err)));
+  //TODO: Implement refresh token flow
+  // @Effect()
+  // refreshToken = this.actions$
+  //   .pipe(
+  //     ofType(AuthActions.TRY_REFRESH_ACCESS_TOKEN),
+  //     take(1)
+  //   )
+  //   .pipe(switchMap(() => this.store.select('auth')))
+  //   .pipe(switchMap((authState: { token: { refresh_token: string } }) => {
+  //     console.log(authState)
+  //     const payload = {
+  //       grant_type: "refresh_token",
+  //       auth0ClientId: this.auth0ClientId,
+  //       auth0ClientSecret: this.auth0ClientSecret,
+  //       refresh_token: authState.token.refresh_token
+  //     };
+  //     return this.http.post(`${this.auth0AppDomain}/oauth/token`, payload)
+  //   }))
+  //   .pipe(mergeMap((result: {
+  //     access_token: string,
+  //     expires_in: number,
+  //     scope: string,
+  //     id_token: string,
+  //     token_type: string
+  //   }) => {
+  //     return [
+  //       {
+  //         type: AuthActions.SET_ACCESS_TOKEN,
+  //         access_token: result.access_token,
+  //         expires_at: result.expires_in
+  //       }
+  //     ]
+  //   }))
+  //   .pipe(catchError(err => of(err)));
 
-  constructor(private actions$: Actions,
-              private store: Store<fromAuth.FeatureState>,
-              private router: Router,
-              private http: HttpClient) {
+  constructor(
+    @Inject('BASE_URL') private baseUrl,
+    @Inject('AUTH0_APP_DOMAIN') private auth0AppDomain,
+    @Inject('AUTH0_AUDIENCE') private auth0Audience,
+    @Inject('AUTH0_CLIENT_ID') private auth0ClientId,
+    @Inject('AUTH0_CLIENT_SECRET') private auth0ClientSecret,
+    @Inject('AUTH0_CONNECTION') private auth0Connection,
+    private actions$: Actions,
+    private store: Store<fromAuth.State>,
+    private router: Router,
+    private http: HttpClient) {
   }
 }

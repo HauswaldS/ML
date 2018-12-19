@@ -1,25 +1,54 @@
 <div id="main-container" ng-col nzXs="24">
   <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
-    <div nz-col nzXs="24">
-      <nz-table #usersTable [nzData]="dataSet">
+    <div nz-col nzXs="24" nzMd="22" nzLg="20">
+      <nz-divider nzText="Users"></nz-divider>
+      <nz-table #usersTable
+                [nzScroll]="{ y: '70vh'}"
+                [nzData]="tableDataSet.users"
+                [nzFrontPagination]="false"
+                [nzTotal]="tableDataSet.totalCount"
+                [nzPageIndex]="tableConfig.page"
+                [nzPageSize]="tableConfig.limit"
+                [nzLoading]="tableIsLoading"
+                (nzPageIndexChange)="onPageChange($event)"
+                [nzTitle]="nzHeader">
+        <ng-template #nzHeader>
+          <button nz-button nzType="primary" routerLink="./create">
+            Create a User
+          </button>
+        </ng-template>
         <thead>
         <tr>
+          <th>Avatar</th>
           <th>Username</th>
           <th>Groups</th>
-          <th nzWidth="10%">Action</th>
+          <th nzWidth="15%">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let data of usersTable.data">
-          <td>{{data.username}}</td>
-          <td>sup</td>
+        <tr *ngFor="let user of usersTable.data">
           <td>
-            <button nz-button nzType="primary" nzShape="circle">
-              <i nz-icon type="search">
+            <img class="avatar" [src]="(user.avatar ? user.avatar : 'default-avatar.jpg') | formatImageUrl  " alt="">
+          </td>
+          <td>{{user.username}}</td>
+          <td>{{user.groups | arrayOfObjectsToString:'label':' | '}}</td>
+          <td class="actions">
+            <button nz-button
+                    (click)="onEditUser(user._key)"
+                    nzType="primary"
+                    nzSize="large"
+                    nzShape="circle">
+              <i nz-icon type="edit">
               </i>
             </button>
-            <button nz-button nzType="primary" nzShape="circle">
-              <i nz-icon type="search">
+            <nz-divider nzType="vertical"></nz-divider>
+            <button nz-button
+                    (click)="onDeleteUser(user._key)"
+                    nzGhost
+                    nzType="danger"
+                    nzSize="large"
+                    nzShape="circle">
+              <i nz-icon type="delete">
               </i>
             </button>
           </td>
@@ -27,8 +56,15 @@
         </tbody>
       </nz-table>
     </div>
-    <div ng-col nzXs="24">
-      <router-outlet></router-outlet>
-    </div>
+    <nz-modal nzWrapClassName="vertical-center-modal"
+              [nzFooter]="null"
+              [nzTitle]="modalTitle"
+              [nzContent]="modalContent"
+              [(nzVisible)]="isModalVisible"
+              (nzOnCancel)="handleModalCancel()">
+      <ng-template #modalContent>
+        <router-outlet></router-outlet>
+      </ng-template>
+    </nz-modal>
   </div>
 </div>

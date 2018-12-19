@@ -19,9 +19,13 @@ registerLocaleData(en);
 
 import {AppComponent} from './app.component';
 
-import {environment} from "../environments/environment";
-import {AuthEffects} from "./auth/store/auth.effects";
 import {reducers} from "./store/app.reducers";
+
+import {AuthEffects} from "./auth/store/auth.effects";
+import {UsersEffects} from "./dashboard/users/store/users.effects";
+
+import {environment} from "../environments/environment";
+
 
 @NgModule({
   declarations: [
@@ -32,13 +36,21 @@ import {reducers} from "./store/app.reducers";
     BrowserAnimationsModule,
     HttpClientModule,
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, UsersEffects]),
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     AppRoutingModule,
     CoreModule
   ],
-  providers: [{provide: NZ_I18N, useValue: en_US}],
+  providers: [
+    {provide: NZ_I18N, useValue: en_US},
+    {provide: "BASE_URL", useValue: environment.baseUrl},
+    {provide: "AUTH0_APP_DOMAIN", useValue: environment.auth0appDomain},
+    {provide: "AUTH0_AUDIENCE", useValue: environment.auth0audience},
+    {provide: "AUTH0_CLIENT_ID", useValue: environment.auth0ClientId},
+    {provide: "AUTH0_CLIENT_SECRET", useValue: environment.auth0ClientSecret},
+    {provide: "AUTH0_CONNECTION", useValue: environment.auth0Connection}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

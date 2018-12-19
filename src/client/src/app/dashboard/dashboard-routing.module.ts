@@ -16,7 +16,7 @@ const routes: Routes = [
       {
         path: 'users', component: UsersComponent, children: [
           {path: 'create', component: UserFormComponent},
-          {path: 'edit', component: UserFormComponent}
+          {path: ':id/edit', component: UserFormComponent}
         ]
       }
     ]

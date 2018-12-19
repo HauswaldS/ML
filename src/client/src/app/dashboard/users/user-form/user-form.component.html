@@ -1,3 +1,143 @@
-<p>
-  user-form works!
-</p>
+<form nz-form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <h1>{{isCreatingUser ? 'Create':'Update'}} a User</h1>
+  <nz-divider></nz-divider>
+  <nz-form-item>
+    <nz-upload *ngIf="!userForm.controls['avatar'].value && !b64AvatarPreview"
+               class="avatar-uploader"
+               nzAction="nope"
+               nzListType="picture-card"
+               [nzShowUploadList]="false"
+               [nzBeforeUpload]="beforeUpload"
+               (nzChange)="handleUploadChange($event)">
+      <ng-container>
+        <i nz-icon type="plus"></i>
+        <div class="upload-text">Avatar</div>
+      </ng-container>
+    </nz-upload>
+    <ng-croppie *ngIf="b64AvatarPreview"
+                [imageUrl]="b64AvatarPreview"
+                [croppieOptions]="{
+                  boundary: {width:300, height:300},
+                  viewport: { width: 200, height: 200,  type: 'circle'}
+                }"
+                [outputFormatOptions]="{
+                  type:'base64',
+                  size:'viewport',
+                  circle: true
+                }"
+                (imageCropped)="updateUserAvatar($event)">
+    </ng-croppie>
+    <ng-container *ngIf="userForm.controls['avatar'].value">
+      <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
+        <div nz-col nzXs="24">
+          <img
+            [src]="userForm.controls['avatar'].value | formatImageUrl"
+            class="avatar">
+        </div>
+        <div nz-col nzXs="24" style="margin-top:1rem">
+          <button nz-button
+                  [nzGhost]="true"
+                  [nzType]="'danger'"
+                  (click)="removeAvatar()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control nzHasFeedback>
+      <nz-input-group [nzPrefix]="prefixUsername">
+        <input type="text"
+               nz-input
+               formControlName="username"
+               placeholder="Username">
+      </nz-input-group>
+      <nz-form-explain *ngIf="!userForm.controls['username'].valid && userForm.controls['username'].dirty">
+        {{
+        userForm.controls['username'].errors.required ?
+        'Username is required' :
+        (userForm.controls['username'].errors.minlength ?
+        'Minimum length 6 characters' : 'Maximum length 20 characters')
+        }}
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control nzHasFeedback>
+      <nz-input-group [nzPrefix]="prefixEmail">
+        <input type="email"
+               nz-input
+               formControlName="email"
+               placeholder="Email">
+      </nz-input-group>
+      <nz-form-explain *ngIf="!userForm.controls['email'].valid && userForm.controls['email'].dirty">
+        {{
+        userForm.controls['email'].errors && userForm.controls['email'].errors.required ?
+        'Email is required' :
+        'A valid email is required'
+        }}
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item *ngIf="isCreatingUser">
+    <nz-form-control nzHasFeedback>
+      <nz-input-group [nzPrefix]="prefixPassword">
+        <input type="password"
+               nz-input
+               formControlName="password"
+               placeholder="Password">
+      </nz-input-group>
+      <nz-form-explain *ngIf="!userForm.controls['password'].valid && userForm.controls['password'].dirty">Please
+        {{
+        userForm.controls['password'].errors && userForm.controls['password'].errors.required ?
+        'Password is required' :
+        'The minimum length is 6 characters'
+        }}
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control>
+      <nz-input-group [nzAddOnBefore]="prefixGroups">
+        <nz-select
+          style="width: 100%"
+          formControlName="groups"
+          nzMode="multiple"
+          nzPlaceHolder="Select the user groups"
+          nzAllowClear
+          nzShowSearch
+          [nzServerSearch]="true"
+          (nzOnSearch)="updateUsersGroupsList($event)">
+          <ng-container *ngFor="let group of usersGroupsList">
+            <nz-option *ngIf="!usersGroupsListLoading"
+                       [nzValue]="group._key"
+                       [nzLabel]="group.label">
+            </nz-option>
+          </ng-container>
+          <nz-option *ngIf="usersGroupsListLoading" nzDisabled nzCustomContent>
+            <i nz-icon type="loading" class="loading-icon"></i> Loading Data...
+          </nz-option>
+        </nz-select>
+        <nz-form-explain *ngIf="!userForm.controls['groups'].valid && userForm.controls['groups'].dirty">
+          The user must be part of at least one group
+        </nz-form-explain>
+      </nz-input-group>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-divider></nz-divider>
+  <nz-form-item [nzFlex]="true" [ngStyle]="{'justify-content':'flex-end'}">
+    <button nz-button [nzType]="'primary'"
+            nzSize="large"
+            [disabled]="!userForm.valid"
+            [nzLoading]="isFormLoading"
+            id="submitBtn">
+      {{isCreatingUser ? 'Create' : 'Update'}}
+    </button>
+  </nz-form-item>
+</form>
+<ng-template #prefixUsername><i nz-icon type="user"></i></ng-template>
+<ng-template #prefixEmail><i nz-icon type="mail"></i></ng-template>
+<ng-template #prefixPassword><i nz-icon type="lock"></i></ng-template>
+<ng-template #prefixGroups><i nz-icon type="team"></i></ng-template>
+

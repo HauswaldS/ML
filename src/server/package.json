@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Thermacote website, server side made with Express",
   "scripts": {
-    "watch:dev": "cross-env NODE_ENV=development && nodemon ./server.js --exec babel-node --watch",
+    "watch:dev": "cross-env NODE_ENV=development && nodemon  --inspect ./server.js --exec babel-node --watch",
     "build:dev": "cross-env NODE_ENV=development && rimraf dist && babel . -d dist --ignore node_modules",
     "build:prod": "cross-env NODE_ENV=production && rimraf dist && babel . -d dist --ignore node_modules",
     "start:dev": "cross-env NODE_ENV=development && babel-node ./server.js",
@@ -15,6 +15,7 @@
     "arangojs": "^6.9.0",
     "auth0": "^2.14.0",
     "body-parser": "^1.18.3",
+    "connect-busboy": "0.0.2",
     "cors": "^2.8.4",
     "dotenv": "2.0.0",
     "dotenv-expand": "^0.1.0",
@@ -25,7 +26,8 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.8",
-    "mongoose": "^5.3.4"
+    "mongoose": "^5.3.4",
+    "shortid": "^2.2.14"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

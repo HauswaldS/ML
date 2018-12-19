@@ -1,9 +1,15 @@
 #main-container {
   #menuContainer {
-    height: 100%;
+    height: 100vh;
+
     .ant-menu-vertical {
       height: 100%;
-
+      position: fixed;
+      //TODO: change later
+      width: 15%;
+      .ant-table-header {
+        overflow: auto;
+      }
       .ant-menu-item {
         a {
           text-align: center;

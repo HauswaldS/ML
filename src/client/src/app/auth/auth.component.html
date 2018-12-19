@@ -4,7 +4,7 @@
     <h1>{{ isSigningUp ? 'Sign up' : 'Sign in'}}</h1>
     <form nz-form [formGroup]="authForm" class="login-form" (ngSubmit)="onSubmit()">
       <nz-form-item>
-        <nz-form-control>
+        <nz-form-control nzHasFeedback>
           <nz-input-group [nzPrefix]="prefixEmail">
             <input type="email" nz-input formControlName="email" placeholder="Email">
           </nz-input-group>
@@ -18,7 +18,7 @@
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
-        <nz-form-control>
+        <nz-form-control nzHasFeedback>
           <nz-input-group [nzPrefix]="prefixPassword">
             <input type="password" nz-input formControlName="password" placeholder="Password">
           </nz-input-group>
@@ -26,7 +26,7 @@
             {{
             authForm.controls['password'].errors && authForm.controls['password'].errors.required ?
             'Password is required' :
-            'The minimum length is 6 characters'
+            isSigningUp ?'The minimum length is 6 characters':''
             }}
           </nz-form-explain>
         </nz-form-control>
@@ -35,10 +35,12 @@
         <button nz-button nzBlock [nzType]="'primary'" id="submitBtn">
           {{isSigningUp ? 'Sign up' : 'Sign in'}}
         </button>
-        <p *ngIf="!isSigningUp">You don't have an account yet ? <a (click)="isSigningUp = true" class="helpText">Click here to sign
+        <p *ngIf="!isSigningUp">You don't have an account yet ? <a (click)="isSigningUp = true" class="helpText">Click
+          here to sign
           up</a>
         </p>
-        <p *ngIf="isSigningUp">Already have an account ? <a (click)="isSigningUp = false" class="helpText">Click here to sign in</a></p>
+        <p *ngIf="isSigningUp">Already have an account ? <a (click)="isSigningUp = false" class="helpText">Click here to
+          sign in</a></p>
       </nz-form-item>
     </form>
     <ng-template #prefixEmail><i nz-icon type="mail"></i></ng-template>

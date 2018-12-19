@@ -6,8 +6,11 @@ import getDotenv from './utils/dotenv';
 
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import {getUserFromRequest} from "./middlewares/auth.middleware";
+import busboy from 'connect-busboy';
+import {getUserFromRequest, isUserAuthenticated} from "./middlewares/auth.middleware";
 
+
+import filesController from './controllers/files';
 import userController from './controllers/users';
 
 getDotenv();
@@ -17,11 +20,16 @@ const app = express();
 
 // setup middleware
 app.use(bodyParser.json());
+app.use(busboy({highWaterMark: 2 * 1024 * 1024}))
 app.use('*', cors());
 app.use(getUserFromRequest);
 app.use('/public', express.static('public'));
 
+// TODO: DRY
 // setup api routes
+app.post('/api/upload', filesController.upload);
+app.delete('/api/upload/:filename', filesController.delete);
+
 app.get('/api/users', userController.getAll);
 app.get('/api/users/:userId', userController.get);
 app.post('/api/users', userController.create);
