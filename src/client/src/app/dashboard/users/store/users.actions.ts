@@ -21,7 +21,9 @@ export class TryToGetUsers implements Action {
     page: number,
     limit: number,
     searchProp: string,
-    searchValue: string | number
+    searchValue: string | number,
+    sortProp: string,
+    sortValue: string | number
   }) {
   }
 }

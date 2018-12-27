@@ -1,8 +1,6 @@
 import {Inject, Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {Store} from "@ngrx/store";
 
-import * as fromUsers from './users.reducers';
 import * as UsersActions from './users.actions';
 
 import {Actions, Effect, ofType} from "@ngrx/effects";
@@ -23,6 +21,8 @@ export class UsersEffects {
           .set('limit', String(action.params.limit))
           .set('searchProp', String(action.params.searchProp))
           .set('searchValue', String(action.params.searchValue))
+          .set('sortProp', String(action.params.sortProp))
+          .set('sortValue', String(action.params.sortValue))
       });
     }))
     .pipe(map((payload: { users: User[], totalCount: number }) => {
@@ -91,7 +91,6 @@ export class UsersEffects {
         groups
       }
     }));
-
 
 
   constructor(

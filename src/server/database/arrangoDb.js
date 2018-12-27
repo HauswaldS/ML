@@ -8,14 +8,15 @@ db.useDatabase(process.env.DB_NAME);
 db.useBasicAuth(process.env.DB_USERNAME, process.env.DB_PASSWORD);
 
 export default {
-    getUsers({page, limit, searchProp, searchValue}) {
+    // ----------- Users -----------
+    getUsers({page, limit, searchProp, searchValue, sortProp, sortValue}) {
         return db.query(aql`
             LET totalCount = LENGTH((FOR user in Users
                             FILTER user[${searchProp}] LIKE ${`%${searchValue}%`}
                             RETURN user))  
             LET users = (FOR user in Users
                             FILTER user[${searchProp}] LIKE ${`%${searchValue}%`}
-                            SORT user._key DESC
+                            SORT user[${sortProp}] ${sortValue === 'descend' ? 'DESC' : 'ASC'}
                             LIMIT ${(page - 1) * limit}, ${+limit}  
                             RETURN MERGE(user, {groups: DOCUMENT("Users_groups", user.groups)}))
             RETURN {
@@ -52,7 +53,11 @@ export default {
             FOR userGroup IN Users_groups
                 RETURN userGroup
        `).then(cursor => cursor._result)
-    }
+    },
+
+    // ----------- Datasets -----------
+
+    // getDatasets()
 }
 
 

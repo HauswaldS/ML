@@ -16,11 +16,28 @@
           <button nz-button nzType="primary" routerLink="./create">
             Create a User
           </button>
+          <nz-input-group ngClass="searchInputGroup"
+                          nzSize="large"
+                          [nzAddOnBefore]="searchPropertySelect">
+            <input type="text"
+                   nz-input
+                   #searchInput
+                   (input)="search(searchInput.value)"
+                   [ngModel]="tableConfig.searchValue">
+          </nz-input-group>
+          <ng-template #searchPropertySelect>
+            <nz-select (change)="updateUsersList(false)" [(ngModel)]="tableConfig.searchProp">
+              <nz-option *ngFor="let searchProp of searchProps"
+                         [nzLabel]="searchProp.label"
+                         [nzValue]="searchProp.value"></nz-option>
+            </nz-select>
+          </ng-template>
         </ng-template>
-        <thead>
+        <thead (nzSortChange)="sort($event)" nzSingleSort>
         <tr>
           <th>Avatar</th>
-          <th>Username</th>
+          <th nzShowSort nzSortKey="username">Username</th>
+          <th nzShowSort nzSortKey="email">Email</th>
           <th>Groups</th>
           <th nzWidth="15%">Actions</th>
         </tr>
@@ -31,6 +48,7 @@
             <img class="avatar" [src]="(user.avatar ? user.avatar : 'default-avatar.jpg') | formatImageUrl  " alt="">
           </td>
           <td>{{user.username}}</td>
+          <td>{{user.email }}</td>
           <td>{{user.groups | arrayOfObjectsToString:'label':' | '}}</td>
           <td class="actions">
             <button nz-button

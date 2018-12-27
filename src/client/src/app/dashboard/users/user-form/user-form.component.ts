@@ -145,7 +145,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
       observer.next(isJpgOrPng && isLt1m);
       observer.complete();
     })
-  }
+  };
 
   handleUploadChange(info: { file: UploadFile }) {
     if (info.file.status === 'uploading') {
@@ -194,29 +194,29 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (this.userForm.valid) {
       this.isFormLoading = true;
       if (!this.userToEdit && this.userForm.value.avatar ||
-        this.userToEdit.avatar != this.userForm.value.avatar) {
-        const formData: FormData = new FormData();
-        const blob = this.dataURItoBlob(this.userForm.value.avatar);
+        this.userToEdit && this.userToEdit.avatar != this.userForm.value.avatar) {
 
-        formData.append("file", blob, '.png');
-        console.log(this.userToEdit.avatar);
+        const hasToUploadAvatar = this.userForm.value.avatar.includes('base64');
 
         if (this.userToEdit.avatar) {
           this.uploadService.deleteFile(this.userToEdit.avatar);
         }
 
-        if (this.userForm.value.avatar) {
+        if (hasToUploadAvatar) {
+          const formData: FormData = new FormData();
+          const blob = this.dataURItoBlob(this.userForm.value.avatar);
+
+          formData.append("file", blob, '.png');
           this.upload$ = this.uploadService.uploadFile(
             formData,
             (reqStatus) => console.log(reqStatus)
-          ).subscribe((reqStatus) => {
+          ).subscribe((reqStatus: any) => {
             this.updateUserAvatar(reqStatus.event.body.filename);
             this.createOrUpdateUser();
           })
         } else {
           this.createOrUpdateUser();
         }
-
       } else {
         this.createOrUpdateUser();
       }
