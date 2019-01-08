@@ -193,12 +193,11 @@ export class UserFormComponent implements OnInit, OnDestroy {
   onSubmit() {
     if (this.userForm.valid) {
       this.isFormLoading = true;
-      if (!this.userToEdit && this.userForm.value.avatar ||
-        this.userToEdit && this.userToEdit.avatar != this.userForm.value.avatar) {
+      const hasToUploadAvatar = this.userForm.value.avatar.includes('base64');
+      const hasToDeleteOldAvatar = this.userToEdit && this.userToEdit.avatar;
 
-        const hasToUploadAvatar = this.userForm.value.avatar.includes('base64');
-
-        if (this.userToEdit.avatar) {
+      if (hasToUploadAvatar || (hasToUploadAvatar && hasToDeleteOldAvatar)) {
+        if (hasToDeleteOldAvatar) {
           this.uploadService.deleteFile(this.userToEdit.avatar);
         }
 
@@ -220,7 +219,6 @@ export class UserFormComponent implements OnInit, OnDestroy {
       } else {
         this.createOrUpdateUser();
       }
-
     }
   }
 

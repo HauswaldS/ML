@@ -1,3 +1,88 @@
-<p>
-  datasets works!
-</p>
+<div id="main-container" ng-col nzXs="24">
+  <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
+    <div nz-col nzXs="24" nzMd="22" nzLg="20">
+      <nz-divider nzText="Datasets"></nz-divider>
+      <nz-table #datasetsTable
+                [nzScroll]="{ y: '70vh'}"
+                [nzData]="tableDataSet.datasets"
+                [nzFrontPagination]="false"
+                [nzTotal]="tableDataSet.totalCount"
+                [nzPageIndex]="tableConfig.page"
+                [nzPageSize]="tableConfig.limit"
+                [nzLoading]="tableIsLoading"
+                (nzPageIndexChange)="onPageChange($event)"
+                [nzTitle]="nzHeader">
+        <ng-template #nzHeader>
+          <button nz-button nzType="primary" routerLink="./create">
+            Create a Dataset
+          </button>
+          <nz-input-group ngClass="searchInputGroup"
+                          nzSize="large"
+                          [nzAddOnBefore]="searchPropertySelect">
+            <input type="text"
+                   nz-input
+                   #searchInput
+                   (input)="search(searchInput.value)"
+                   [ngModel]="tableConfig.searchValue">
+          </nz-input-group>
+          <ng-template #searchPropertySelect>
+            <nz-select (change)="updateDatasetsList(false)" [(ngModel)]="tableConfig.searchProp">
+              <nz-option *ngFor="let searchProp of searchProps"
+                         [nzLabel]="searchProp.label"
+                         [nzValue]="searchProp.value"></nz-option>
+            </nz-select>
+          </ng-template>
+        </ng-template>
+        <thead (nzSortChange)="sort($event)" nzSingleSort>
+        <tr>
+          <th nzShowSort nzSortKey="title">Title</th>
+          <th nzShowSort nzSortKey="entries">Entries</th>
+          <th nzShowSort nzSortKey="size">Size</th>
+          <th nzShowSort nzSortKey="format">Format</th>
+          <th nzWidth="15%">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let dataset of tableDataSet.datasets">
+          <td>{{dataset.title}}</td>
+          <td>{{dataset.entries}}</td>
+          <!--TODO: Add pipe-->
+          <td>{{dataset.size}}</td>
+          <!--TODO: Add pipe-->
+          <td>{{dataset.format}}</td>
+          <td class="actions">
+            <button nz-button
+                    (click)="onEditDataset(dataset._key)"
+                    nzType="primary"
+                    nzSize="large"
+                    nzShape="circle">
+              <i nz-icon type="edit">
+              </i>
+            </button>
+            <nz-divider nzType="vertical"></nz-divider>
+            <button nz-button
+                    (click)="onDeleteDataset(dataset._key)"
+                    nzGhost
+                    nzType="danger"
+                    nzSize="large"
+                    nzShape="circle">
+              <i nz-icon type="delete">
+              </i>
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </nz-table>
+    </div>
+    <nz-modal nzWrapClassName="vertical-center-modal"
+              [nzFooter]="null"
+              [nzTitle]="modalTitle"
+              [nzContent]="modalContent"
+              [(nzVisible)]="isModalVisible"
+              (nzOnCancel)="handleModalCancel()">
+      <ng-template #modalContent>
+        <router-outlet></router-outlet>
+      </ng-template>
+    </nz-modal>
+  </div>
+</div>

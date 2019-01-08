@@ -23,6 +23,7 @@ import {reducers} from "./store/app.reducers";
 
 import {AuthEffects} from "./auth/store/auth.effects";
 import {UsersEffects} from "./dashboard/users/store/users.effects";
+import {DatasetsEffects} from "./dashboard/datasets/store/datasets.effects";
 
 import {environment} from "../environments/environment";
 
@@ -36,7 +37,7 @@ import {environment} from "../environments/environment";
     BrowserAnimationsModule,
     HttpClientModule,
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([AuthEffects, UsersEffects]),
+    EffectsModule.forRoot([AuthEffects, UsersEffects, DatasetsEffects]),
     StoreRouterConnectingModule,
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     AppRoutingModule,

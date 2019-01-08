@@ -11,8 +11,6 @@ import * as fromUsers from './store/users.reducers';
 import * as UsersActions from './store/users.actions';
 
 import {User} from "./models/user.model";
-import {UserGroup} from "./models/user-group.model";
-
 
 @Component({
   selector: 'app-users',
@@ -24,7 +22,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   private searchValue$: Subscription;
   private searchValue = new Subject<string>();
 
-  private usersGroups: UserGroup[];
   private tableDataSet: { users: User[], totalCount: number };
   private tableConfig: {
     page: number,
@@ -85,7 +82,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   sort(sort: { key: string, value: string }): void {
-    console.log(sort)
     this.tableConfig.sortProp = sort.key;
     this.tableConfig.sortValue = sort.value;
     this.updateUsersList(false);
@@ -95,7 +91,6 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.store.select('users')
       .subscribe((usersState: fromUsers.State) => {
         this.tableDataSet = usersState.list;
-        this.usersGroups = usersState.groups;
         this.tableIsLoading = false;
       });
 

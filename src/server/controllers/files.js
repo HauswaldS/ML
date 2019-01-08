@@ -8,7 +8,6 @@ export default {
             const filename = `${shortid.generate()}${extension}`;
             const writeFileStream = fs.createWriteStream(`./public/uploads/${filename}`);
             file.pipe(writeFileStream);
-
             writeFileStream.on('finish', () => {
                 console.log('All writes are now complete.');
                 res.send({filename})

@@ -1,0 +1,67 @@
+<form nz-form [formGroup]="datasetForm" (ngSubmit)="onSubmit()">
+  <h1>{{isCreatingDataset ? 'Create':'Update'}} a Dataset</h1>
+  <nz-divider></nz-divider>
+  <nz-form-item>
+    <nz-upload *ngIf="!datasetForm.controls['filename'].value"
+               class="avatar-uploader"
+               nzAction="nope"
+               nzListType="picture-card"
+               [nzShowUploadList]="false"
+               [nzBeforeUpload]="beforeUpload"
+               (nzChange)="handleUploadChange($event)">
+      <ng-container *ngIf="!isFileLoading">
+        <i nz-icon type="plus"></i>
+        <div class="upload-text">File</div>
+      </ng-container>
+      <ng-container *ngIf="isFileLoading">
+        <i nz-icon type="loading"></i>
+      </ng-container>
+    </nz-upload>
+    <ng-container *ngIf="datasetForm.controls['filename'].value">
+      <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
+        <div nz-col nzXs="24">
+          {{ datasetForm.controls['filename'].value }}
+        </div>
+        <div nz-col nzXs="24" style="margin-top:1rem">
+          <button nz-button
+                  [nzGhost]="true"
+                  [nzType]="'danger'"
+                  (click)="removeFile()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </ng-container>
+    <nz-form-explain *ngIf="!datasetForm.controls['filename'].valid && datasetForm.controls['filename'].dirty">
+      {{ 'Dataset file is required'}}
+    </nz-form-explain>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-control nzHasFeedback>
+      <nz-input-group [nzPrefix]="prefixTitle">
+        <input type="text"
+               nz-input
+               formControlName="title"
+               placeholder="Title">
+      </nz-input-group>
+      <nz-form-explain *ngIf="!datasetForm.controls['title'].valid && datasetForm.controls['title'].dirty">
+        {{
+        datasetForm.controls['username'].errors.required ?
+        'Tile is required' : 'Maximum length 30 characters'
+        }}
+      </nz-form-explain>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-divider></nz-divider>
+  <nz-form-item [nzFlex]="true" [ngStyle]="{'justify-content':'flex-end'}">
+    <button nz-button [nzType]="'primary'"
+            nzSize="large"
+            [disabled]="!datasetForm.valid"
+            [nzLoading]="isFormLoading"
+            id="submitBtn">
+      {{isCreatingDataset ? 'Create' : 'Update'}}
+    </button>
+  </nz-form-item>
+</form>
+<ng-template #prefixTitle><i nz-icon type="info"></i></ng-template>
+
