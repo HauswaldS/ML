@@ -8,7 +8,7 @@ import {DashboardHomeComponent} from "./dashboard-home/dashboard-home.component"
 
 import {UsersModule} from "./users/users.module";
 import {DatasetsModule} from "./datasets/datasets.module";
-
+import {PipesModule} from "../shared/pipes/pipes.module";
 
 @NgModule({
   declarations: [
@@ -20,7 +20,8 @@ import {DatasetsModule} from "./datasets/datasets.module";
     DashboardRoutingModule,
     UsersModule,
     DatasetsModule,
-    NgZorroAntdModule
+    NgZorroAntdModule,
+    PipesModule
   ]
 })
 export class DashboardModule {

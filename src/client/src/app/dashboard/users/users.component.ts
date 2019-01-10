@@ -47,6 +47,8 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+
+
     this.deletedUser$ = this.actions$
       .pipe(ofType(UsersActions.DELETE_USER))
       .subscribe(() => {

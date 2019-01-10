@@ -12,7 +12,7 @@ import * as DatasetsActions from "../store/datasets.actions";
 
 import {Dataset} from "../models/dataset.model";
 
-import {UploadService} from "../../../shared/upload.service";
+import {UploadService} from "../../../shared/services/upload.service";
 
 @Component({
   selector: 'app-dataset-form',
@@ -62,7 +62,7 @@ export class DatasetFormComponent implements OnInit, OnDestroy {
       .pipe(take(1))
       .subscribe(([datasetsState, params]) => {
         const dataset = {
-          filename: '',
+          fileName: '',
           title: ''
         };
 
@@ -72,12 +72,12 @@ export class DatasetFormComponent implements OnInit, OnDestroy {
 
         if (!this.isCreatingDataset) {
           this.datasetToEdit = datasetsState.list.datasets.find(u => u._key === datasetId);
-          dataset.filename = this.datasetToEdit.filename;
+          dataset.fileName = this.datasetToEdit.fileName;
           dataset.title = this.datasetToEdit.title;
         }
 
         this.datasetForm = new FormGroup({
-          'filename': new FormControl(dataset.filename, [Validators.required]),
+          'fileName': new FormControl(dataset.fileName, [Validators.required]),
           'title': new FormControl(dataset.title, [Validators.required])
         });
       });
@@ -87,7 +87,7 @@ export class DatasetFormComponent implements OnInit, OnDestroy {
     return new Observable((observer: Observer<boolean>) => {
       const isCsv = file.name.includes('.csv');
       if (!isCsv) {
-        this.msg.error('You can only upload a CSV file !');
+        this.msg.error('You can only upload a CSV file (more file format coming soon!)');
         observer.complete();
         return;
       }
@@ -112,48 +112,46 @@ export class DatasetFormComponent implements OnInit, OnDestroy {
 
     if (info.file.status === 'error') {
       this.isFileLoading = false;
-      this.datasetForm.controls['filename'].patchValue(info.file.name);
+      this.datasetForm.controls['fileName'].patchValue(info.file.name);
       this.fileToUpload = info.file.originFileObj;
     }
   }
 
   removeFile() {
-    this.datasetForm.controls['filename'].patchValue('');
+    this.datasetForm.controls['fileName'].patchValue('');
     this.fileToUpload = null;
   }
 
   onSubmit() {
     if (this.datasetForm.valid) {
       this.isFormLoading = true;
-      const hasToUploadFile = this.datasetForm.value.filename;
-      const hasToDeleteOldFile = this.datasetToEdit && this.datasetToEdit.filename !== this.datasetForm.value.filename;
-      const payload = {
-        filename: this.datasetForm.value.filename,
-        title: this.datasetForm.value.title
-      }
 
-      if (hasToDeleteOldFile) {
-        this.uploadService.deleteFile(this.datasetToEdit.filename);
-      }
+      const hasToUploadFile = this.datasetForm.value.fileName ||
+        this.datasetToEdit.fileName !== this.datasetForm.value.fileName;
 
       if (hasToUploadFile) {
         const formData: FormData = new FormData();
         formData.append("file", this.fileToUpload, '.csv');
         this.upload$ = this.uploadService.uploadFile(
           formData,
+          'dataset',
           (reqStatus) => console.log(reqStatus)
         ).subscribe((reqStatus: any) => {
-          payload.filename = reqStatus.event.body.filename;
-          this.createOrUpdateDataset(payload);
+          this.datasetForm.controls['fileName'].patchValue(reqStatus.event.body.filename);
+          this.createOrUpdateDataset();
         })
       } else {
-        // this.createOrUpdateDataset(payload);
+        this.createOrUpdateDataset();
       }
     }
   }
 
 
-  createOrUpdateDataset(payload) {
+  createOrUpdateDataset() {
+    const payload = {
+      fileName: this.datasetForm.value.fileName,
+      title: this.datasetForm.value.title
+    };
     if (this.isCreatingDataset) {
       this.store.dispatch(new DatasetsActions.TryToCreateDataset(payload))
     } else {

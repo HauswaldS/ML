@@ -6,8 +6,8 @@ import {Actions} from "@ngrx/effects";
 import {Observable} from "rxjs";
 import {switchMap, take} from "rxjs/operators";
 
-import * as fromApp from '../store/app.reducers';
-import * as fromAuth from '../auth/store/auth.reducers';
+import * as fromApp from '../../store/app.reducers';
+import * as fromAuth from '../../auth/store/auth.reducers';
 
 export class AuthInterceptor implements HttpInterceptor {
   constructor(@Inject('BASE_URL') private baseUrl: string,

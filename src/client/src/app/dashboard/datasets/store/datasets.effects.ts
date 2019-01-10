@@ -41,10 +41,10 @@ export class DatasetsEffects {
       switchMap((action: DatasetActions.TryToCreateDataset) => {
         return this.http.post(`${this.baseUrl}/api/datasets`, {...action.payload})
       }),
-      map((payload: { dataset: Dataset }) => {
+      map((dataset: Dataset) => {
         return {
           type: DatasetActions.ADD_DATASET,
-          dataset: payload.dataset
+          dataset
         }
       })
     );
@@ -57,10 +57,11 @@ export class DatasetsEffects {
       switchMap((action: DatasetActions.TryToUpdateDataset) => {
         return this.http.put(`${this.baseUrl}/api/datasets/${action.id}`, {...action.dataset})
       }),
-      map((payload: { dataset: Dataset }) => {
+      map((dataset: Dataset) => {
+
         return {
           type: DatasetActions.UPDATE_DATASET,
-          dataset: payload.dataset
+          dataset
         }
       })
     );
@@ -73,10 +74,10 @@ export class DatasetsEffects {
       switchMap((action: DatasetActions.TryToDeleteDataset) => {
         return this.http.delete(`${this.baseUrl}/api/datasets/${action.id}`)
       }),
-      map((payload: { id: string }) => {
+      map(() => {
+        console.log('1')
         return {
-          type: DatasetActions.UPDATE_DATASET,
-          id: payload.id
+          type: DatasetActions.DELETE_DATASET
         }
       })
     );

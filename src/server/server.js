@@ -27,24 +27,26 @@ app.use(getUserFromRequest);
 app.use('/public', express.static('public'));
 
 // TODO: DRY
-//Files upload
-app.post('/api/upload', filesController.upload);
-app.delete('/api/upload/:filename', filesController.delete);
+//Files
+app.post('/api/upload/:type', filesController.upload);
+app.delete('/api/upload/:type/:filename', filesController.delete);
 
 //Users
 app.get('/api/users', usersController.getAll);
 app.get('/api/users/:userId', usersController.get);
+// TODO: Find a cleaner way to fetch the user on signin
+app.get('/api/users/email/:userEmail', usersController.getByEmail);
 app.post('/api/users', usersController.create);
 app.put('/api/users/:userId', usersController.update);
 app.delete('/api/users/:userId', usersController.delete);
-
-//Users groups
 app.get('/api/users-groups', usersController.getUsersGroups);
 
 //Datasets
 app.get('/api/datasets', datasetsController.getAll);
 app.get('/api/datasets/:datasetId', datasetsController.get);
 app.post('/api/datasets', datasetsController.create);
+app.put('/api/datasets/:datasetId', datasetsController.update);
+app.delete('/api/datasets/:datasetId', datasetsController.delete);
 
 app.listen(PORT, () => {
     console.log('Serveur listening on port: ' + PORT);

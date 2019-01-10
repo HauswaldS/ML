@@ -1,6 +1,8 @@
-<div id="main-container" nz-row nzType="flex">
-  <div nz-col nzXs="6" nzMd="4" nzLg="3" id="menuContainer">
-    <ul nz-menu nzMode="vertical" nzTheme="dark">
+<nz-layout>
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzTrigger]="triggerTemplate">
+    <div class="logo">
+    </div>
+    <ul id="side-menu" nz-menu [nzTheme]="'dark'" [nzMode]="'inline'" [nzInlineCollapsed]="isCollapsed">
       <li>
         <a routerLink="/dashboard">
           <img src="assets/images/electronic_brain-512.png" alt="">
@@ -14,8 +16,33 @@
         </a>
       </li>
     </ul>
-  </div>
-  <div nz-col nzXs="18" nzMd="20" nzLg="21">
-    <router-outlet></router-outlet>
-  </div>
-</div>
+  </nz-sider>
+  <nz-layout>
+    <nz-header id="main-header">
+      <i class="trigger" nz-icon [type]="isCollapsed?'menu-unfold':'menu-fold'"
+         (click)="isCollapsed=!isCollapsed"></i>
+      <nz-dropdown id="dropdown"
+                   *ngIf="loggedInUser"
+                   nzTrigger="click"
+                   [(nzVisible)]="isDropdownVisible">
+        <a nz-dropdown>
+          <img class="avatar"
+               [src]="loggedInUser.avatar ? (loggedInUser.avatar  | formatFileUrl :'image' : false) : ('default-avatar.jpg' | formatFileUrl : 'image' : true)"
+               alt="">
+          {{loggedInUser.username}}
+          <i nz-icon [type]="isDropdownVisible ? 'up':'down'"></i>
+        </a>
+        <ul nz-menu nzSelectable id="dropdown-menu">
+          <li nz-menu-item (click)="logout()">
+            <i nz-icon type="logout"></i>
+            <a>Logout</a>
+          </li>
+        </ul>
+      </nz-dropdown>
+      `,
+    </nz-header>
+    <nz-content style="margin:0 16px;">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

@@ -12,10 +12,10 @@ export class UploadService {
     private http: HttpClient) {
   }
 
-  uploadFile(formData, progressCallback: (reqStatus: { event: HttpEvent<any>, percentDone: number }) => void | null) {
+  uploadFile(formData, type, progressCallback: (reqStatus: { event: HttpEvent<any>, percentDone: number }) => void | null) {
     const req = new HttpRequest(
       'POST',
-      `${this.baseUrl}/api/upload`,
+      `${this.baseUrl}/api/upload/${type}`,
       formData,
       {reportProgress: true}
     );

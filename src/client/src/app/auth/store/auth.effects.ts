@@ -3,17 +3,20 @@ import {Actions, Effect, ofType} from "@ngrx/effects";
 import {HttpClient} from "@angular/common/http";
 import {Store} from "@ngrx/store";
 
-import {map, mergeMap, switchMap} from 'rxjs/operators';
+import {map, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 import * as AuthActions from './auth.actions';
 
 import * as fromAuth from './auth.reducers'
 
 import {Router} from "@angular/router";
+import {User} from "../../dashboard/users/models/user.model";
 
 
 @Injectable()
 export class AuthEffects {
+
+  userEmail: string;
 
   @Effect()
   authSignup =
@@ -60,7 +63,6 @@ export class AuthEffects {
     .pipe(switchMap((userCredentials: { email: string, password: string }) => {
       const payload = {
         grant_type: 'password',
-
         client_id: this.auth0ClientId,
         client_secret: this.auth0ClientSecret,
         username: userCredentials.email,
@@ -68,32 +70,55 @@ export class AuthEffects {
         auth0Audience: this.auth0Audience,
         scope: 'offline_access'
       };
-
+      this.userEmail = userCredentials.email;
       return this.http.post(`${this.auth0AppDomain}/oauth/token`, payload)
     }))
-    .pipe(mergeMap((
-      result: {
-        access_token: string,
-        token_type: string,
-        expires_in: number,
-        refresh_token: string
-      }) => {
-      this.router.navigate(['/dashboard'])
-      return [
-        {
-          type: AuthActions.SIGNIN
-        },
-        {
-          type: AuthActions.SET_REFRESH_TOKEN,
-          refresh_token: result.refresh_token,
-        },
-        {
-          type: AuthActions.SET_ACCESS_TOKEN,
-          access_token: result.access_token,
-          expires_at: result.expires_in
-        },
-      ]
-    }));
+    .pipe(
+      mergeMap((
+        result: {
+          access_token: string,
+          token_type: string,
+          expires_in: number,
+          refresh_token: string
+        }) => {
+
+        this.router.navigate(['/dashboard']);
+        return [
+          {
+            type: AuthActions.TRY_TO_GET_LOGGED_IN_USER,
+            userEmail: this.userEmail
+          },
+          {
+            type: AuthActions.SET_REFRESH_TOKEN,
+            refresh_token: result.refresh_token,
+          },
+          {
+            type: AuthActions.SET_ACCESS_TOKEN,
+            access_token: result.access_token,
+            expires_at: result.expires_in
+          },
+        ]
+      }));
+
+
+
+  @Effect()
+  tryToGetLoggedInUser = this.actions$
+    .pipe(
+      ofType(AuthActions.TRY_TO_GET_LOGGED_IN_USER),
+      switchMap((action: AuthActions.TryToGetLoggedInUser) => this.http.get(`${this.baseUrl}/api/users/email/${action.userEmail}`)),
+      mergeMap((user: User) => {
+        return [
+          {
+            type: AuthActions.SET_LOGGED_IN_USER,
+            user
+          },
+          {
+            type: AuthActions.SIGNIN
+          }
+        ]
+      })
+    )
 
   //TODO: Implement refresh token flow
   // @Effect()

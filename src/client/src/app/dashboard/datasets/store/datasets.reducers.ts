@@ -27,10 +27,11 @@ export function datasetsReducer(state = initialState, action: DatasetsActions.Da
         }
       };
     case(DatasetsActions.ADD_DATASET):
+      console.log(action.dataset);
       return {
         ...state,
         list: {
-          datasets: [...state.list.datasets].pop().unshift(action.dataset),
+          datasets: [action.dataset, ...state.list.datasets],
           totalCount: state.list.totalCount++
         }
       };
@@ -43,16 +44,16 @@ export function datasetsReducer(state = initialState, action: DatasetsActions.Da
             .map(d => d._key === action.dataset._key ? action.dataset : d)
         }
       };
-    case(DatasetsActions.DELETE_DATASET):
-      return {
-        ...state,
-        list: {
-          ...state.list,
-          datasets: state.list.datasets
-            .filter(d => d._key !== action.id),
-          totalCount: state.list.totalCount--
-        }
-      };
+    // case(DatasetsActions.DELETE_DATASET):
+    //   return {
+    //     ...state,
+    //     list: {
+    //       ...state.list,
+    //       datasets: state.list.datasets
+    //         .filter(d => d._key !== action.id),
+    //       totalCount: state.list.totalCount--
+    //     }
+    //   };
     default:
       return state;
   }

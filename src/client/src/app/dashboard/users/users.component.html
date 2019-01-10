@@ -45,7 +45,9 @@
         <tbody>
         <tr *ngFor="let user of usersTable.data">
           <td>
-            <img class="avatar" [src]="(user.avatar ? user.avatar : 'default-avatar.jpg') | formatImageUrl  " alt="">
+            <img class="avatar"
+                 [src]="user.avatar ? (user.avatar  | formatFileUrl :'image' : false) : ('default-avatar.jpg' | formatFileUrl : 'image' : true)"
+                 alt="">
           </td>
           <td>{{user.username}}</td>
           <td>{{user.email }}</td>

@@ -37,19 +37,27 @@
         <tr>
           <th nzShowSort nzSortKey="title">Title</th>
           <th nzShowSort nzSortKey="entries">Entries</th>
+          <th nzShowSort nzSortKey="format">Type</th>
           <th nzShowSort nzSortKey="size">Size</th>
-          <th nzShowSort nzSortKey="format">Format</th>
+          <th>File</th>
           <th nzWidth="15%">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let dataset of tableDataSet.datasets">
           <td>{{dataset.title}}</td>
-          <td>{{dataset.entries}}</td>
-          <!--TODO: Add pipe-->
-          <td>{{dataset.size}}</td>
-          <!--TODO: Add pipe-->
-          <td>{{dataset.format}}</td>
+          <td>{{dataset.entries | formatNumber}}</td>
+          <td><img [src]="dataset.format + '.png' | formatFileUrl : 'image' : true" alt=""></td>
+          <td>{{dataset.fileSize | formatFileSize}}</td>
+          <td>
+            <a nz-button
+               nzType="primary"
+               nzShape="round"
+               [href]="dataset.fileName | formatFileUrl : 'dataset' : false"
+               target="_blank">
+              <i nz-icon type="download"></i>
+            </a>
+          </td>
           <td class="actions">
             <button nz-button
                     (click)="onEditDataset(dataset._key)"

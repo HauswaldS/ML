@@ -2,7 +2,7 @@
   <h1>{{isCreatingDataset ? 'Create':'Update'}} a Dataset</h1>
   <nz-divider></nz-divider>
   <nz-form-item>
-    <nz-upload *ngIf="!datasetForm.controls['filename'].value"
+    <nz-upload *ngIf="!datasetForm.controls['fileName'].value"
                class="avatar-uploader"
                nzAction="nope"
                nzListType="picture-card"
@@ -17,10 +17,10 @@
         <i nz-icon type="loading"></i>
       </ng-container>
     </nz-upload>
-    <ng-container *ngIf="datasetForm.controls['filename'].value">
+    <ng-container *ngIf="datasetForm.controls['fileName'].value">
       <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
         <div nz-col nzXs="24">
-          {{ datasetForm.controls['filename'].value }}
+          {{ datasetForm.controls['fileName'].value }}
         </div>
         <div nz-col nzXs="24" style="margin-top:1rem">
           <button nz-button
@@ -32,7 +32,7 @@
         </div>
       </div>
     </ng-container>
-    <nz-form-explain *ngIf="!datasetForm.controls['filename'].valid && datasetForm.controls['filename'].dirty">
+    <nz-form-explain *ngIf="!datasetForm.controls['fileName'].valid && datasetForm.controls['fileName'].dirty">
       {{ 'Dataset file is required'}}
     </nz-form-explain>
   </nz-form-item>

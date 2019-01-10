@@ -5,9 +5,10 @@ export class Dataset {
     public _rev: string,
     public title: string,
     public entries: number,
-    public size: number,
+    public columnNames: string[],
     public format: string,
-    public filename: string
+    public fileName: string,
+    public fileSize: number
   ) {
   }
 }

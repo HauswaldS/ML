@@ -37,7 +37,7 @@ export class TryToCreateDataset implements Action {
   readonly type = TRY_TO_CREATE_DATASET;
 
   constructor(public payload: {
-    filename: string,
+    fileName: string,
     title: string,
   }) {
   }
@@ -55,7 +55,7 @@ export class TryToUpdateDataset implements Action {
   readonly type = TRY_TO_UPDATE_DATASET;
 
   constructor(public id: string, public dataset: {
-    filename: string,
+    fileName: string,
     title: string,
   }) {
   }

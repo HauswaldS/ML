@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {RouterReducerState} from "@ngrx/router-store";
 import {Store} from "@ngrx/store";
@@ -61,7 +61,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
     this.searchValue$ = this.searchValue.subscribe((term) => {
       this.updateDatasetsList(false)
-    })
+    });
 
 
     this.store.select('router')
@@ -103,7 +103,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
       this.tableConfig.page = this.tableConfig.page - 1
     }
     this.tableIsLoading = true;
-    this.store.dispatch(new DatasetsActions.TryToGetDatasets(this.tableConfig))
+    this.store.dispatch(new DatasetsActions.TryToGetDatasets(this.tableConfig));
   }
 
   onEditDataset(id: string) {
@@ -111,7 +111,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   onDeleteDataset(id: string) {
-    this.store.dispatch(new DatasetsActions.TryToDeleteDataset(id))
+    this.store.dispatch(new DatasetsActions.TryToDeleteDataset(id));
   }
 
   onPageChange(page: number) {
@@ -121,7 +121,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
   handleModalCancel() {
     this.isModalVisible = false;
-    this.router.navigate(['/dashboard/datasets'])
+    this.router.navigate(['/dashboard/datasets']);
   }
 
 

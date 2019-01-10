@@ -1,4 +1,5 @@
 import * as AuthActions from './auth.actions';
+import {User} from "../../dashboard/users/models/user.model";
 
 export interface State {
   token: {
@@ -6,6 +7,7 @@ export interface State {
     access_token: string,
     expires_at: number,
   };
+  user: User,
   isAuthenticated: boolean;
 }
 
@@ -15,6 +17,7 @@ const initialState = {
     access_token: '',
     expires_at: 0
   },
+  user: null,
   isAuthenticated: false
 };
 
@@ -24,7 +27,12 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
     case (AuthActions.SIGNIN):
       return {...state, isAuthenticated: true};
     case (AuthActions.LOGOUT):
-      return {...state, isAuthenticated: false};
+      return {...initialState};
+    case (AuthActions.SET_LOGGED_IN_USER):
+      return {
+        ...state,
+        user: action.user
+      }
     case (AuthActions.SET_ACCESS_TOKEN):
       return {
         ...state,

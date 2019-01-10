@@ -31,7 +31,7 @@
       <div nz-row nzType="flex" nzJustify="center" nzAlign="center">
         <div nz-col nzXs="24">
           <img
-            [src]="userForm.controls['avatar'].value | formatImageUrl"
+            [src]="userForm.controls['avatar'].value | formatFileUrl :'image' : false"
             class="avatar">
         </div>
         <div nz-col nzXs="24" style="margin-top:1rem">

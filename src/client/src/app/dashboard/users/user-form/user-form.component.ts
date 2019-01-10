@@ -5,7 +5,7 @@ import {Store} from "@ngrx/store";
 import {Actions, ofType} from "@ngrx/effects";
 
 import {NzMessageService, UploadFile} from "ng-zorro-antd";
-import {UploadService} from "../../../shared/upload.service";
+import {UploadService} from "../../../shared/services/upload.service";
 
 import {combineLatest, merge, Observable, Observer, Subscription} from "rxjs";
 import {switchMap, take} from "rxjs/operators";
@@ -113,7 +113,7 @@ export class UserFormComponent implements OnInit, OnDestroy {
       .subscribe((usersState) => {
         this.usersGroupsList = usersState.groups;
         this.usersGroupsListLoading = false;
-      })
+      });
 
     this.updateUsersGroupsList('');
   }
@@ -194,28 +194,20 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (this.userForm.valid) {
       this.isFormLoading = true;
       const hasToUploadAvatar = this.userForm.value.avatar.includes('base64');
-      const hasToDeleteOldAvatar = this.userToEdit && this.userToEdit.avatar;
 
-      if (hasToUploadAvatar || (hasToUploadAvatar && hasToDeleteOldAvatar)) {
-        if (hasToDeleteOldAvatar) {
-          this.uploadService.deleteFile(this.userToEdit.avatar);
-        }
+      if (hasToUploadAvatar) {
+        const formData: FormData = new FormData();
+        const blob = this.dataURItoBlob(this.userForm.value.avatar);
 
-        if (hasToUploadAvatar) {
-          const formData: FormData = new FormData();
-          const blob = this.dataURItoBlob(this.userForm.value.avatar);
-
-          formData.append("file", blob, '.png');
-          this.upload$ = this.uploadService.uploadFile(
-            formData,
-            (reqStatus) => console.log(reqStatus)
-          ).subscribe((reqStatus: any) => {
-            this.updateUserAvatar(reqStatus.event.body.filename);
-            this.createOrUpdateUser();
-          })
-        } else {
+        formData.append("file", blob, '.png');
+        this.upload$ = this.uploadService.uploadFile(
+          formData,
+          'image',
+          (reqStatus) => console.log(reqStatus)
+        ).subscribe((reqStatus: any) => {
+          this.updateUserAvatar(reqStatus.event.body.filename);
           this.createOrUpdateUser();
-        }
+        })
       } else {
         this.createOrUpdateUser();
       }

@@ -1,5 +1,7 @@
 import {Action} from "@ngrx/store";
 
+import {User} from "../../dashboard/users/models/user.model";
+
 export const TRY_SIGNUP = 'TRY_SIGNUP';
 export const TRY_SIGNIN = 'TRY_SIGNIN';
 export const SIGNUP = 'SIGNUP';
@@ -7,7 +9,10 @@ export const SIGNIN = 'SIGNIN';
 export const LOGOUT = 'LOGOUT';
 export const SET_ACCESS_TOKEN = 'SET_ACCESS_TOKEN';
 export const SET_REFRESH_TOKEN = 'SET_REFRESH_TOKEN';
-export const TRY_REFRESH_ACCESS_TOKEN = 'TRY_REFRESH_ACCESS_TOKEN';
+export const TRY_TO_GET_LOGGED_IN_USER = 'TRY_TO_GET_LOGGED_IN_USER';
+export const SET_LOGGED_IN_USER = 'SET_LOGGED_IN_USER';
+
+// export const TRY_REFRESH_ACCESS_TOKEN = 'TRY_REFRESH_ACCESS_TOKEN';
 
 export class TrySignup implements Action {
   readonly type = TRY_SIGNUP;
@@ -33,7 +38,7 @@ export class SignUp implements Action {
 export class SignIn implements Action {
   readonly type = SIGNIN;
 
-  constructor() {
+  constructor(public user: User) {
   }
 }
 
@@ -41,6 +46,20 @@ export class Logout implements Action {
   readonly type = LOGOUT;
 
   constructor() {
+  }
+}
+
+export class TryToGetLoggedInUser implements Action {
+  readonly type = TRY_TO_GET_LOGGED_IN_USER;
+
+  constructor(public userEmail: string) {
+  }
+}
+
+export class SetLoggedInUser implements Action {
+  readonly type = SET_LOGGED_IN_USER;
+
+  constructor(public user: User) {
   }
 }
 
@@ -74,6 +93,8 @@ export type AuthActions =
   | SignUp
   | SignIn
   | Logout
+  | TryToGetLoggedInUser
+  | SetLoggedInUser
   | SetAccessToken
   | SetRefreshToken
 
