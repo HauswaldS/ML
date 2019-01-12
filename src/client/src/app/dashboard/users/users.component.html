@@ -26,7 +26,9 @@
                    [ngModel]="tableConfig.searchValue">
           </nz-input-group>
           <ng-template #searchPropertySelect>
-            <nz-select (change)="updateUsersList(false)" [(ngModel)]="tableConfig.searchProp">
+            <nz-select
+              (ngModelChange)="onSearchPropChanges($event)"
+              [(ngModel)]="tableConfig.searchProp">
               <nz-option *ngFor="let searchProp of searchProps"
                          [nzLabel]="searchProp.label"
                          [nzValue]="searchProp.value"></nz-option>
@@ -63,11 +65,13 @@
             </button>
             <nz-divider nzType="vertical"></nz-divider>
             <button nz-button
-                    (click)="onDeleteUser(user._key)"
                     nzGhost
                     nzType="danger"
                     nzSize="large"
-                    nzShape="circle">
+                    nzShape="circle"
+                    nz-popconfirm
+                    nzTitle="Are you sure to delete this User?"
+                    (nzOnConfirm)="onDeleteUser(user._key)">
               <i nz-icon type="delete">
               </i>
             </button>

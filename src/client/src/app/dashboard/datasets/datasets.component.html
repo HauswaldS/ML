@@ -26,7 +26,8 @@
                    [ngModel]="tableConfig.searchValue">
           </nz-input-group>
           <ng-template #searchPropertySelect>
-            <nz-select (change)="updateDatasetsList(false)" [(ngModel)]="tableConfig.searchProp">
+            <nz-select (ngModelChange)="onSearchPropChanges($event)"
+                       [(ngModel)]="tableConfig.searchProp">
               <nz-option *ngFor="let searchProp of searchProps"
                          [nzLabel]="searchProp.label"
                          [nzValue]="searchProp.value"></nz-option>
@@ -38,7 +39,7 @@
           <th nzShowSort nzSortKey="title">Title</th>
           <th nzShowSort nzSortKey="entries">Entries</th>
           <th nzShowSort nzSortKey="format">Type</th>
-          <th nzShowSort nzSortKey="size">Size</th>
+          <th nzShowSort nzSortKey="fileSize">Size</th>
           <th>File</th>
           <th nzWidth="15%">Actions</th>
         </tr>
@@ -69,11 +70,13 @@
             </button>
             <nz-divider nzType="vertical"></nz-divider>
             <button nz-button
-                    (click)="onDeleteDataset(dataset._key)"
                     nzGhost
                     nzType="danger"
                     nzSize="large"
-                    nzShape="circle">
+                    nzShape="circle"
+                    nz-popconfirm
+                    nzTitle="Are you sure to delete this Dataset?"
+                    (nzOnConfirm)="onDeleteDataset(dataset._key)">
               <i nz-icon type="delete">
               </i>
             </button>

@@ -78,6 +78,11 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.initTable()
   }
 
+  onSearchPropChanges(searchProp) {
+    this.tableConfig.searchProp = searchProp;
+    this.updateUsersList(false);
+  }
+
   search(term: string): void {
     this.tableConfig.searchValue = term;
     this.searchValue.next(term);

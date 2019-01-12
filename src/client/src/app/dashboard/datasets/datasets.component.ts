@@ -77,6 +77,22 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     this.initTable()
   }
 
+  onSearchPropChanges(searchProp) {
+    this.tableConfig.searchProp = searchProp;
+    this.updateDatasetsList(false);
+  }
+
+  search(term: string): void {
+    this.tableConfig.searchValue = term;
+    this.searchValue.next(term);
+  }
+
+  sort(sort: { key: string, value: string }): void {
+    this.tableConfig.sortProp = sort.key;
+    this.tableConfig.sortValue = sort.value;
+    this.updateDatasetsList(false);
+  }
+
   initTable() {
     this.store.select('datasets')
       .subscribe((datasetsState: fromDatasets.State) => {
