@@ -32,14 +32,24 @@ export function authReducer(state = initialState, action: AuthActions.AuthAction
       return {
         ...state,
         user: action.user
-      }
+      };
     case (AuthActions.SET_ACCESS_TOKEN):
       return {
         ...state,
-        token: {...state.token, access_token: action.access_token, expires_at: (Date.now() + action.expires_at)}
+        token: {
+          ...state.token,
+          access_token: action.access_token,
+          expires_at: (Date.now() + action.expires_at)
+        }
       };
     case (AuthActions.SET_REFRESH_TOKEN):
-      return {...state, token: {...state.token, refresh_token: action.refresh_token}};
+      return {
+        ...state,
+        token: {
+          ...state.token,
+          refresh_token: action.refresh_token
+        }
+      };
     default:
       return state
   }

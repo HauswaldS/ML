@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpEvent, HttpEventType, HttpRequest} from "@angular/common/http";
-import {catchError, last, map, tap} from "rxjs/operators";
+import {last, map, tap} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'

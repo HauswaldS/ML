@@ -2,12 +2,12 @@ import {Inject, Injectable} from "@angular/core";
 import {Actions, Effect, ofType} from "@ngrx/effects";
 import {HttpClient} from "@angular/common/http";
 import {Store} from "@ngrx/store";
-
-import {map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, mergeMap, switchMap} from 'rxjs/operators';
 
 import * as AuthActions from './auth.actions';
-
 import * as fromAuth from './auth.reducers'
+
+import {ErrorHandlerService} from "../../shared/services/errorHandler.service";
 
 import {Router} from "@angular/router";
 import {User} from "../../dashboard/users/models/user.model";
@@ -21,59 +21,67 @@ export class AuthEffects {
   @Effect()
   authSignup =
     this.actions$
-      .pipe(ofType(AuthActions.TRY_SIGNUP))
-      .pipe(map((action: AuthActions.TrySignup) => {
-        return action.payload;
-      }))
-      .pipe(switchMap((userCredentials: { email: string, password: string }) => {
-        const userPayload = {
-          username: userCredentials.email.split('@')[0],
-          email: userCredentials.email,
-          password: userCredentials.password,
-          groups: ['16993']
-        };
+      .pipe(
+        ofType(AuthActions.TRY_SIGNUP),
+        map((action: AuthActions.TrySignup) => {
+          return action.payload;
+        }),
+        switchMap((userCredentials: { email: string, password: string }) => {
+          const userPayload = {
+            username: userCredentials.email.split('@')[0],
+            email: userCredentials.email,
+            password: userCredentials.password,
+            groups: ['16993']
+          };
 
-        return this.http.post(`${this.baseUrl}/api/users`, userPayload)
-      }))
-      .pipe(mergeMap((user: {
-        email: string,
-        password: string
-      }) => {
-        return [
-          {
-            type: AuthActions.SIGNUP
-          },
-          {
-            type: AuthActions.TRY_SIGNIN,
-            payload: {
-              email: user.email,
-              password: user.password,
+          return this.http.post(`${this.baseUrl}/api/users`, userPayload)
+            .pipe(
+              map(res => res),
+              catchError(this.errorHandler.handle(AuthActions.TRY_SIGNUP, 'An error occurred while signing up'))
+            )
+        }),
+        mergeMap((user: {
+          email: string,
+          password: string
+        }) => {
+          return [
+            {
+              type: AuthActions.SIGNUP
+            },
+            {
+              type: AuthActions.TRY_SIGNIN,
+              payload: {
+                email: user.email,
+                password: user.password,
+              }
             }
-          }
-        ]
-      }));
+          ]
+        }));
 
 
   @Effect()
   authSignIn = this.actions$
-    .pipe(ofType(AuthActions.TRY_SIGNIN))
-    .pipe(map((action: AuthActions.TrySignin) => {
-      return action.payload;
-    }))
-    .pipe(switchMap((userCredentials: { email: string, password: string }) => {
-      const payload = {
-        grant_type: 'password',
-        client_id: this.auth0ClientId,
-        client_secret: this.auth0ClientSecret,
-        username: userCredentials.email,
-        password: userCredentials.password,
-        auth0Audience: this.auth0Audience,
-        scope: 'offline_access'
-      };
-      this.userEmail = userCredentials.email;
-      return this.http.post(`${this.auth0AppDomain}/oauth/token`, payload)
-    }))
-    .pipe(
+    .pipe(ofType(AuthActions.TRY_SIGNIN),
+      map((action: AuthActions.TrySignin) => {
+        return action.payload;
+      }),
+      switchMap((userCredentials: { email: string, password: string }) => {
+        const payload = {
+          grant_type: 'password',
+          client_id: this.auth0ClientId,
+          client_secret: this.auth0ClientSecret,
+          username: userCredentials.email,
+          password: userCredentials.password,
+          auth0Audience: this.auth0Audience,
+          scope: 'offline_access'
+        };
+        this.userEmail = userCredentials.email;
+        return this.http.post(`${this.auth0AppDomain}/oauth/token`, payload)
+          .pipe(
+            map(res => res),
+            catchError(this.errorHandler.handle(AuthActions.TRY_SIGNIN, 'An error occurred while signing in'))
+          )
+      }),
       mergeMap((
         result: {
           access_token: string,
@@ -101,12 +109,16 @@ export class AuthEffects {
       }));
 
 
-
   @Effect()
   tryToGetLoggedInUser = this.actions$
     .pipe(
       ofType(AuthActions.TRY_TO_GET_LOGGED_IN_USER),
-      switchMap((action: AuthActions.TryToGetLoggedInUser) => this.http.get(`${this.baseUrl}/api/users/email/${action.userEmail}`)),
+      switchMap((action: AuthActions.TryToGetLoggedInUser) => {
+        return this.http.get(`${this.baseUrl}/api/users/email/${action.userEmail}`).pipe(
+          map(res => res),
+          catchError(this.errorHandler.handle(AuthActions.TRY_TO_GET_LOGGED_IN_USER, 'An error occurred while trying to get the current logged in user.'))
+        )
+      }),
       mergeMap((user: User) => {
         return [
           {
@@ -118,7 +130,7 @@ export class AuthEffects {
           }
         ]
       })
-    )
+    );
 
   //TODO: Implement refresh token flow
   // @Effect()
@@ -162,6 +174,7 @@ export class AuthEffects {
     @Inject('AUTH0_CLIENT_ID') private auth0ClientId,
     @Inject('AUTH0_CLIENT_SECRET') private auth0ClientSecret,
     @Inject('AUTH0_CONNECTION') private auth0Connection,
+    private errorHandler: ErrorHandlerService,
     private actions$: Actions,
     private store: Store<fromAuth.State>,
     private router: Router,

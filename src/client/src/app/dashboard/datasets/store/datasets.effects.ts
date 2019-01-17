@@ -1,10 +1,12 @@
 import {Inject, Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Actions, Effect, ofType} from "@ngrx/effects";
-import {map, switchMap} from "rxjs/operators";
+import {catchError, map, switchMap} from "rxjs/operators";
 
 
 import * as DatasetActions from './datasets.actions';
+
+import {ErrorHandlerService} from "../../../shared/services/errorHandler.service";
 import {Dataset} from "../models/dataset.model";
 
 @Injectable()
@@ -23,7 +25,10 @@ export class DatasetsEffects {
             .set('searchValue', String(action.params.searchValue))
             .set('sortProp', String(action.params.sortProp))
             .set('sortValue', String(action.params.sortValue))
-        })
+        }).pipe(
+          map(res => res),
+          catchError(this.errorHandler.handle(DatasetActions.TRY_TO_GET_DATASETS, 'An error occurred while trying to get the datasets list.'))
+        )
       }),
       map((payload: { datasets: Dataset[], totalCount: number }) => {
         return {
@@ -40,6 +45,10 @@ export class DatasetsEffects {
       ofType(DatasetActions.TRY_TO_CREATE_DATASET),
       switchMap((action: DatasetActions.TryToCreateDataset) => {
         return this.http.post(`${this.baseUrl}/api/datasets`, {...action.payload})
+          .pipe(
+          map(res => res),
+          catchError(this.errorHandler.handle(DatasetActions.TRY_TO_CREATE_DATASET, 'An error occurred while trying to create a dataset.'))
+        )
       }),
       map((dataset: Dataset) => {
         return {
@@ -56,6 +65,10 @@ export class DatasetsEffects {
       ofType(DatasetActions.TRY_TO_UPDATE_DATASET),
       switchMap((action: DatasetActions.TryToUpdateDataset) => {
         return this.http.put(`${this.baseUrl}/api/datasets/${action.id}`, {...action.dataset})
+          .pipe(
+            map(res => res),
+            catchError(this.errorHandler.handle(DatasetActions.TRY_TO_UPDATE_DATASET, 'An error occurred while trying to update a dataset.'))
+          )
       }),
       map((dataset: Dataset) => {
 
@@ -73,9 +86,12 @@ export class DatasetsEffects {
       ofType(DatasetActions.TRY_TO_DELETE_DATASET),
       switchMap((action: DatasetActions.TryToDeleteDataset) => {
         return this.http.delete(`${this.baseUrl}/api/datasets/${action.id}`)
+          .pipe(
+            map(res => res),
+            catchError(this.errorHandler.handle(DatasetActions.TRY_TO_DELETE_DATASET, 'An error occurred while trying to delete a dataset.'))
+          )
       }),
       map(() => {
-        console.log('1')
         return {
           type: DatasetActions.DELETE_DATASET
         }
@@ -85,6 +101,7 @@ export class DatasetsEffects {
   constructor(
     @Inject('BASE_URL') private baseUrl: string,
     private actions$: Actions,
+    private errorHandler: ErrorHandlerService,
     private http: HttpClient) {
   }
 }
